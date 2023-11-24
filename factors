@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+typedef struct
+{
+	int first;
+	int second;
+} Pair;
+
+Pair factorize(int n)
+{
+	int i;
+
+	for (i = 2; i <= sqrt(n); ++i)
+	{
+		if (n % i == 0)
+		{
+			Pair factors = {i, n / i};
+			return (factors);
+		}
+	}
+
+	Pair factors = {n, 1};
+	return (factors);
+}
+
+int main(int argc, char* argv[])
+{
+	if (argc != 2)
+	{
+		fprintf(stderr, "Usage: %s <file>\n", argv[0]);
+		return (1);
+	}
+
+	const char* file_path = argv[1];
+	FILE *file= fopen(file_path, "r");
+
+	if (!file)
+	{
+		fprintf(stderr, "Unable to open file: %s\n", file_path);
+		return (1);
+	}
+
+	char *line = NULL;
+	size_t len = 0;
+
+	while (getline(&line, len, file) != -1)
+	{
+		int number = strtol(line, NULL, 10);
+
+		if (number == 0)
+		{
+			fprintf(stderr, "Invalid data in the file: %s\n", file_path);
+			free(line);
+			fclose(file);
+			return(1);
+		}
+
+		Pair factors = factorize(number);
+		printf("%d=%d*%d\n", number, factors.first, factors.second);
+	}
+
+	free(line);
+	fclose(file);
+	return (0);
+}
